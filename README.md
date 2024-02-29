@@ -75,6 +75,33 @@ A new CoAP server can be easily built with help of the class
 
 See [CoAP Example Server](CoAP.Server) for more.
 
+### CoAP DTLS Server
+A new CoAP DTLS server can be easily built with help of the class
+[**CoapServer**](CoAP.NET/Server/CoapServer.cs)
+
+The IDs and PSKs are only examples, keep in mind to use your actual data. 
+
+```csharp
+    private static byte[] ServerID { get; set; } = Encoding.ASCII.GetBytes("cid");
+    private static byte[] ClientID { get; set; } = Encoding.ASCII.GetBytes("cid");
+    private static byte[] ClientPSK { get; set; } = new byte[] { 0xDE, 0xAD, 0xBE, 0xEF };
+    private static byte[] ServerPSK { get; set; } = new byte[] { 0xDE, 0xAD, 0xBE, 0xEF };
+    private static int ServerPort { get; set; } = 5683;
+    static async Task Main(string[] args) 
+    {
+        CoapServer server = new CoapServer();
+        TlsKeyPairSet serverKeys = new TlsKeyPairSet();
+        TlsPskKeySet clientKeys = new TlsPskKeySet();
+        serverKeys.AddKey(new TlsKeyPair(new BasicTlsPskIdentity(ServerID, ServerPSK)));
+        clientKeys.AddKey(ClientID, ClientPSK);
+
+        DTLSEndPoint myDtlsEndpoint = new DTLSEndPoint(serverKeys, clientKeys, ServerPort);
+        server.AddEndPoint(myDtlsEndpoint);
+        server.Add(new HelloWorldResource());
+        server.Start();
+    }
+```
+
 ### CoAP Resource
 CoAP resources are classes that can be accessed by a URI via CoAP.
 In CoAP.NET, a resource is defined as a subclass of [**Resource**](CoAP.NET/Server/Resources/Resource.cs).

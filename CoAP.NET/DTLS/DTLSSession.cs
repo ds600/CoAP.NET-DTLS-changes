@@ -253,7 +253,7 @@ namespace CoAP.DTLS
                 int size = -1;
                 try {
                     if (transport != null) {
-                        size = transport.Receive(buf, 0, buf.Length, 1000);
+                        size = transport.Receive(buf, 0, buf.Length, 1);
                     }
                 }
                 catch (Exception e) {
@@ -271,7 +271,7 @@ namespace CoAP.DTLS
                     byte[] buf2 = new byte[size];
                     Array.Copy(buf, buf2, size);
                     _logger.LogTrace($"DtlsSession.ProcessReceivedData calling FireDataReceived.");
-                    FireDataReceived(buf2, EndPoint, null);  // M00BUG
+                    Task.Run(() => FireDataReceived(buf2, EndPoint, null));  // M00BUG
                 }
             }
         }
@@ -290,7 +290,7 @@ namespace CoAP.DTLS
             while (true) {
                 int size = -1;
                 try {
-                    size = _dtlsSession.Receive(buf, 0, buf.Length, 1000);
+                    size = _dtlsSession.Receive(buf, 0, buf.Length, 1);
                 }
                 catch (Exception e) {
                     _logger.LogError($"Exception in DTLSSession.StartListen: {e.Message}", e);
@@ -306,7 +306,7 @@ namespace CoAP.DTLS
                 } else {
                     byte[] buf2 = new byte[size];
                     Array.Copy(buf, buf2, size);
-                    FireDataReceived(buf2, EndPoint, null);  // M00BUG
+                    Task.Run(() => FireDataReceived(buf2, EndPoint, null));  // M00BUG
                 }
             }
         }
